@@ -12,7 +12,17 @@
     "prisma:migrate:all": "prisma migrate dev --schema=prisma/schema.prisma && prisma migrate dev --schema=prisma-bots/schema.prisma",
     "prisma:studio:all": "prisma studio --schema=prisma/schema.prisma && prisma studio --schema=prisma-bots/schema.prisma",
     "prisma:push:all": "prisma db push --schema=prisma/schema.prisma && prisma db push --schema=prisma-bots/schema.prisma",
-    "prisma:pull:all": "prisma db pull --schema=prisma/schema.prisma && prisma db pull --schema=prisma-bots/schema.prisma"
+    "prisma:pull:all": "prisma db pull --schema=prisma/schema.prisma && prisma db pull --schema=prisma-bots/schema.prisma",
+    "prisma:migrate:bots": "prisma migrate dev --schema=prisma-bots/schema.prisma",
+    "prisma:studio:bots": "prisma studio --schema=prisma-bots/schema.prisma",
+    "prisma:push:bots": "prisma db push --schema=prisma-bots/schema.prisma",
+    "prisma:pull:bots": "prisma db pull --schema=prisma-bots/schema.prisma",
+    "prisma:generate:bots": "prisma generate --schema=prisma-bots/schema.prisma",
+    "prisma:migrate:web": "prisma migrate dev --schema=prisma/schema.prisma",
+    "prisma:studio:web": "prisma studio --schema=prisma/schema.prisma",
+    "prisma:push:web": "prisma db push --schema=prisma/schema.prisma",
+    "prisma:pull:web": "prisma db pull --schema=prisma/schema.prisma",
+    "prisma:generate:web": "prisma generate --schema=prisma/schema.prisma"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
