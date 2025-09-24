@@ -1,5 +1,5 @@
 export interface AuthStep {
-  step: 'phone' | 'sms' | 'register' | 'home';
+  step: 'phone' | 'sms' | 'register' | 'login' | 'home';
 }
 
 export interface PhoneData {
@@ -19,6 +19,12 @@ export interface RegisterData {
   phoneNumber: string;
 }
 
+export interface LoginData {
+  email: string;
+  password: string;
+  phoneNumber: string;
+}
+
 export interface User {
   id: string;
   phoneNumber: string;
@@ -31,7 +37,9 @@ export interface AuthState {
   phoneData?: PhoneData;
   smsData?: SMSData;
   registerData?: RegisterData;
+  loginData?: LoginData;
   user?: User;
+  isExistingUser?: boolean;
   isLoading: boolean;
   error?: string;
 }

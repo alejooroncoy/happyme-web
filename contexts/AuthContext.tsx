@@ -1,14 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { AuthState, AuthStep, PhoneData, SMSData, RegisterData, User } from '@/types/auth';
+import { AuthState, AuthStep, PhoneData, SMSData, RegisterData, LoginData, User } from '@/types/auth';
 
 type AuthAction =
   | { type: 'SET_STEP'; payload: AuthStep['step'] }
   | { type: 'SET_PHONE_DATA'; payload: PhoneData }
   | { type: 'SET_SMS_DATA'; payload: SMSData }
   | { type: 'SET_REGISTER_DATA'; payload: RegisterData }
+  | { type: 'SET_LOGIN_DATA'; payload: LoginData }
   | { type: 'SET_USER'; payload: User }
+  | { type: 'SET_EXISTING_USER'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | undefined }
   | { type: 'RESET' };
@@ -28,8 +30,12 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       return { ...state, smsData: action.payload };
     case 'SET_REGISTER_DATA':
       return { ...state, registerData: action.payload };
+    case 'SET_LOGIN_DATA':
+      return { ...state, loginData: action.payload };
     case 'SET_USER':
       return { ...state, user: action.payload, currentStep: 'home' };
+    case 'SET_EXISTING_USER':
+      return { ...state, isExistingUser: action.payload };
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
     case 'SET_ERROR':
@@ -48,7 +54,9 @@ interface AuthContextType {
   setPhoneData: (data: PhoneData) => void;
   setSMSData: (data: SMSData) => void;
   setRegisterData: (data: RegisterData) => void;
+  setLoginData: (data: LoginData) => void;
   setUser: (user: User) => void;
+  setExistingUser: (isExisting: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | undefined) => void;
   reset: () => void;
@@ -75,8 +83,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_REGISTER_DATA', payload: data });
   };
 
+  const setLoginData = (data: LoginData) => {
+    dispatch({ type: 'SET_LOGIN_DATA', payload: data });
+  };
+
   const setUser = (user: User) => {
     dispatch({ type: 'SET_USER', payload: user });
+  };
+
+  const setExistingUser = (isExisting: boolean) => {
+    dispatch({ type: 'SET_EXISTING_USER', payload: isExisting });
   };
 
   const setLoading = (loading: boolean) => {
@@ -98,7 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPhoneData,
     setSMSData,
     setRegisterData,
+    setLoginData,
     setUser,
+    setExistingUser,
     setLoading,
     setError,
     reset,

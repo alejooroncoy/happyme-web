@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { RegisterData } from '@/types/auth';
+import { UserPlus, Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
 
 export default function RegisterStep() {
-  const { state, setRegisterData, setUser, setLoading, setError } = useAuth();
+  const { state, setRegisterData, setUser, setLoading, setError, goToStep } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -70,112 +71,120 @@ export default function RegisterStep() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Completa tu registro
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Crea tu cuenta con email y contraseña
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-10 text-center">
+            <div className="mx-auto w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6">
+              <UserPlus className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-3">¡Casi listo!</h1>
+            <p className="text-purple-100 text-lg">
+              Completa tu registro en HappyMe con email y contraseña
+            </p>
+          </div>
+          
+          {/* Form */}
+          <div className="px-8 py-8">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Correo electrónico
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="tu@email.com"
+                      className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-800 placeholder-gray-400"
+                      required
+                    />
+                  </div>
+                  {email && !validateEmail(email) && (
+                    <p className="text-sm text-red-500 flex items-center">
+                      <span className="mr-1">⚠️</span>
+                      Ingresa un email válido
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Mínimo 8 caracteres"
+                      className="w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-800 placeholder-gray-400"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 h-5 w-5 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {password && !validatePassword(password) && (
+                    <p className="text-sm text-red-500 flex items-center">
+                      <span className="mr-1">⚠️</span>
+                      La contraseña debe tener al menos 8 caracteres
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Confirmar contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Repite tu contraseña"
+                      className="w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-800 placeholder-gray-400"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3 h-5 w-5 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {confirmPassword && !passwordsMatch && (
+                    <p className="text-sm text-red-500 flex items-center">
+                      <span className="mr-1">⚠️</span>
+                      Las contraseñas no coinciden
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!isFormValid}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+              >
+                <UserPlus className="w-5 h-5" />
+                <span>Crear cuenta en HappyMe</span>
+              </button>
+            </form>
+            
+          </div>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Correo electrónico
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
-                className="mt-1 w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-              {email && !validateEmail(email) && (
-                <p className="mt-1 text-red-500 text-sm">
-                  Ingresa un email válido
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Mínimo 8 caracteres"
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <span className="text-gray-400 hover:text-gray-600">
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
-                  </span>
-                </button>
-              </div>
-              {password && !validatePassword(password) && (
-                <p className="mt-1 text-red-500 text-sm">
-                  La contraseña debe tener al menos 8 caracteres
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirmar contraseña
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repite tu contraseña"
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <span className="text-gray-400 hover:text-gray-600">
-                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-                  </span>
-                </button>
-              </div>
-              {confirmPassword && !passwordsMatch && (
-                <p className="mt-1 text-red-500 text-sm">
-                  Las contraseñas no coinciden
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={!isFormValid}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              Crear cuenta
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

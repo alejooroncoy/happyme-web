@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { SMSData } from '@/types/auth';
+import { MessageSquare, RotateCcw, ArrowLeft } from 'lucide-react';
 
 export default function SMSStep() {
   const { state, setSMSData, goToStep, setLoading, setError } = useAuth();
@@ -81,70 +82,67 @@ export default function SMSStep() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Verifica tu número
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Ingresa el código de 6 dígitos que enviamos a
-          </p>
-          <p className="text-center text-sm font-medium text-gray-900">
-            {state.phoneData?.countryCode} {state.phoneData?.phoneNumber}
-          </p>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <input
-                type="text"
-                value={code}
-                onChange={handleCodeChange}
-                placeholder="000000"
-                className="w-full px-4 py-4 text-center text-2xl font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent tracking-widest"
-                maxLength={6}
-                required
-              />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-10 text-center">
+            <div className="mx-auto w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6">
+              <MessageSquare className="w-10 h-10 text-white" />
             </div>
-            
-            <div className="text-center">
-              {!canResend ? (
-                <p className="text-sm text-gray-500">
-                  Reenviar código en {formatTime(timeLeft)}
-                </p>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleResendCode}
-                  disabled={state.isLoading}
-                  className="text-sm text-blue-600 hover:text-blue-500 font-medium disabled:text-gray-400"
-                >
-                  Reenviar código
-                </button>
-              )}
-            </div>
+            <h1 className="text-3xl font-bold text-white mb-3">Verifica tu número</h1>
+            <p className="text-green-100 text-lg mb-2">
+              Ingresa el código de 6 dígitos que enviamos a tu teléfono
+            </p>
+            <p className="text-green-200 font-medium">
+              {state.phoneData?.countryCode} {state.phoneData?.phoneNumber}
+            </p>
           </div>
+          
+          {/* Form */}
+          <div className="px-8 py-8">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={handleCodeChange}
+                  placeholder="000000"
+                  className="w-full text-center text-3xl font-mono tracking-widest h-16 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-800 placeholder-gray-400"
+                  maxLength={6}
+                  required
+                />
+                
+                <div className="text-center">
+                  {!canResend ? (
+                    <p className="text-sm text-gray-600">
+                      Reenviar código en {formatTime(timeLeft)}
+                    </p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendCode}
+                      disabled={state.isLoading}
+                      className="text-sm text-green-600 hover:text-green-700 font-medium flex items-center justify-center space-x-1 mx-auto"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span>Reenviar código</span>
+                    </button>
+                  )}
+                </div>
+              </div>
 
-          <div className="space-y-4">
-            <button
-              type="submit"
-              disabled={code.length !== 6}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              Verificar código
-            </button>
+              <button
+                type="submit"
+                disabled={code.length !== 6}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+              >
+                <span>Verificar código</span>
+              </button>
+            </form>
             
-            <button
-              type="button"
-              onClick={() => goToStep('phone')}
-              className="w-full text-center text-sm text-gray-600 hover:text-gray-500"
-            >
-              Cambiar número de teléfono
-            </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
