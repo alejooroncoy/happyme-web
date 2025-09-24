@@ -2,8 +2,19 @@
 
 import { BookOpen, Play, Download, Heart, Brain, Moon, Activity } from 'lucide-react';
 
+type ResourceItem = {
+  title: string;
+  type: string;
+  duration?: string;
+};
+
+type ResourceCategory = {
+  category: string;
+  items: ResourceItem[];
+};
+
 export default function ResourcesSection() {
-  const resources = [
+  const resources: ResourceCategory[] = [
     {
       category: 'Meditación',
       items: [
