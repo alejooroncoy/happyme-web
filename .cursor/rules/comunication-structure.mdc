@@ -1,0 +1,46 @@
+---
+description: Reglas para comunicación y estructura en aplicaciones React escalables
+globs: *.tsx,*.ts,*.jsx,*.js
+alwaysApply: true
+---
+
+# Comunicación y Estructura para Aplicaciones React Escalables
+
+Cuando diseñes la comunicación entre componentes en una aplicación React destinada a crecer, sigue estos principios para garantizar escalabilidad, mantenibilidad y rendimiento:
+
+## Comunicación de Padre a Hijo
+
+- **Usa Composition Pattern** para inyectar contenido (children o props de tipo componente) en lugar de prop drilling
+- **Solo pasa props estrictamente necesarias**; evita cadenas de props profundas
+- **Mantén la lógica en el padre** cuando no sea responsabilidad del hijo
+
+## Comunicación entre Hermanos
+
+- **NO uses prop drilling** ni comunicación indirecta a través del padre
+- **Emplea Context API** solo cuando el estado realmente sea compartido y estable
+- **Para eventos en tiempo real** o múltiples emisores/receptores, usa observables (por ejemplo con RxJS BehaviorSubject) o un manejador de estado global como Zustand o Redux Toolkit
+
+## Gestión de Estado
+
+- **Prefiere estado local** (useState, useReducer) cuando el dato solo afecta a un componente
+- **Escala a Context API** por feature o a Redux Toolkit/Zustand para estados amplios o complejos
+- **Implementa memoización** (React.memo, useMemo, useCallback) para evitar re-renders innecesarios
+
+## Arquitectura de Carpetas
+
+- **Separa claramente** componentes de presentación (sin lógica) y containers (con lógica y datos)
+- **Aplica Clean Architecture** o Screaming Architecture para que las carpetas expresen la funcionalidad (e.g. /auth, /dashboard) y no solo el tipo de archivo
+
+## Tipado y Consistencia
+
+- **Usa TypeScript** con interfaces y types bien definidos; evita any
+- **Divide las interfaces** en múltiples tipos pequeños y reutilizables
+
+## Buenas Prácticas de Rendimiento
+
+- **Controla dependencias** en useEffect y actualizaciones de estado para reducir renders
+- **Usa ErrorBoundary y Suspense/Lazy** para manejar errores y carga diferida de componentes
+
+## Principio General
+
+A menos que un requerimiento de negocio exija otra solución (por ejemplo integración obligatoria con una librería específica), evita patrones que dificulten el mantenimiento, como prop drilling masivo o contextos globales innecesarios.
