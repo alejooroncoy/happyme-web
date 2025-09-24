@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma-bots"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_BOTS_URL")
+}
+
+model actions_logs {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  action_type    String?
+  mood_at_action String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  users          users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+}
+
+model reminders {
+  id               Int       @id @default(autoincrement())
+  user_id          Int
+  title            String
+  description      String?
+  datetime_event   DateTime  @db.Timestamp(6)
+  duration_minutes Int?
+  notified         Boolean?  @default(false)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  users            users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_reminders_user")
+}
+
+model users {
+  id                    Int            @id(map: "users _pkey") @default(autoincrement())
+  phone_number          String         @unique(map: "users _phone_number _key") @db.VarChar(20)
+  name                  String         @db.VarChar(255)
+  age                   Int
+  mood                  String?        @db.VarChar(255)
+  has_seen_psychologist Boolean?
+  created_at            DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime?      @default(now()) @db.Timestamptz(6)
+  plan                  UserPlan?
+  college               String?
+  semester              Int?
+  gender                String?        @db.VarChar(1)
+  actions_logs          actions_logs[]
+  reminders             reminders[]
+}
+
+enum UserPlan {
+  Free
+  Premium
+}
