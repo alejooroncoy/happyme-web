@@ -1,0 +1,36 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0F2FE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F9FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="armsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGradient)" stroke="#E0F2FE" stroke-width="2"/>
+  
+  <!-- Central circle (heart/wellbeing) -->
+  <circle cx="100" cy="100" r="35" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
+  
+  <!-- Left arm -->
+  <path d="M 40 80 Q 60 60 75 75 Q 85 85 80 95 Q 75 105 65 100 Q 55 95 50 85 Q 45 75 40 80 Z" 
+        fill="url(#armsGradient)" 
+        stroke="#1E40AF" 
+        stroke-width="1"/>
+  
+  <!-- Right arm -->
+  <path d="M 160 80 Q 140 60 125 75 Q 115 85 120 95 Q 125 105 135 100 Q 145 95 150 85 Q 155 75 160 80 Z" 
+        fill="url(#armsGradient)" 
+        stroke="#1E40AF" 
+        stroke-width="1"/>
+  
+  <!-- Heart symbol in center -->
+  <path d="M 100 85 Q 90 75 85 80 Q 80 85 85 90 Q 90 95 100 100 Q 110 95 115 90 Q 120 85 115 80 Q 110 75 100 85 Z" 
+        fill="#EF4444" 
+        stroke="#DC2626" 
+        stroke-width="1"/>
+</svg>
