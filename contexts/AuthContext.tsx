@@ -23,6 +23,7 @@ const initialState: AuthState = {
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case 'SET_STEP':
+      console.log('AuthReducer: Actualizando paso de', state.currentStep, 'a', action.payload);
       return { ...state, currentStep: action.payload, error: undefined };
     case 'SET_PHONE_DATA':
       return { ...state, phoneData: action.payload };
@@ -68,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const goToStep = (step: AuthStep['step']) => {
+    console.log('AuthContext: Cambiando paso a:', step);
     dispatch({ type: 'SET_STEP', payload: step });
   };
 

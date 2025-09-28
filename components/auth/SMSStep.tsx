@@ -48,6 +48,7 @@ export default function SMSStep() {
         };
         
         setSMSData(smsData);
+        console.log('SMSStep: Navegando a register...');
         goToStep('register');
       } else {
         setError('Código incorrecto. Intenta nuevamente.');

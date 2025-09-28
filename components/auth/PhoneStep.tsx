@@ -44,10 +44,12 @@ export default function PhoneStep() {
       
       setPhoneData(phoneData);
       
-              // Simular verificación de usuario existente
-              // En producción esto sería una llamada al backend
-              const isExistingUser = phoneNumber === '987654321'; // Simular usuario existente
+      // Simular verificación de usuario existente
+      // En producción esto sería una llamada al backend
+      const isExistingUser = phoneNumber === '987654321'; // Simular usuario existente
       setExistingUser(isExistingUser);
+      
+      console.log('PhoneStep: Navegando al siguiente paso...', { isExistingUser, phoneNumber });
       
       if (isExistingUser) {
         goToStep('login');
