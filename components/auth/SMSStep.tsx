@@ -41,14 +41,14 @@ export default function SMSStep() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simular código correcto (en producción sería verificado por el backend)
-      if (code === '123456') {
+      // Código por defecto: 666666
+      if (code === '666666') {
         const smsData: SMSData = {
           code,
           phoneNumber: state.phoneData?.phoneNumber || '',
         };
         
         setSMSData(smsData);
-        console.log('SMSStep: Navegando a register...');
         goToStep('register');
       } else {
         setError('Código incorrecto. Intenta nuevamente.');
@@ -95,6 +95,9 @@ export default function SMSStep() {
             <p className="text-green-100 text-lg mb-2">
               Ingresa el código de 6 dígitos que enviamos a tu teléfono
             </p>
+            <p className="text-green-200 text-sm">
+              Código de prueba: <span className="font-bold">666666</span>
+            </p>
             <p className="text-green-200 font-medium">
               {state.phoneData?.countryCode} {state.phoneData?.phoneNumber}
             </p>
@@ -108,7 +111,7 @@ export default function SMSStep() {
                   type="text"
                   value={code}
                   onChange={handleCodeChange}
-                  placeholder="000000"
+                  placeholder="666666"
                   className="w-full text-center text-3xl font-mono tracking-widest h-16 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-800 placeholder-gray-400"
                   maxLength={6}
                   required

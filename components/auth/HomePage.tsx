@@ -10,11 +10,12 @@ import ProfileSection from '@/components/dashboard/ProfileSection';
 import SettingsSection from '@/components/dashboard/SettingsSection';
 
 export default function HomePage() {
-  const { state, reset } = useAuth();
+  const { state, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
 
   const handleLogout = () => {
-    reset();
+    console.log('🚪 Logging out...');
+    logout();
   };
 
   const renderSection = () => {
@@ -35,7 +36,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar 
         activeSection={activeSection}
@@ -43,9 +44,9 @@ export default function HomePage() {
         onLogout={handleLogout}
       />
       
-      {/* Main Content */}
-      <div className="flex-1 lg:ml-0">
-        <main className="p-6 lg:p-8">
+      {/* Main Content Area */}
+      <div className="ml-0 lg:ml-64">
+        <main className="min-h-screen p-4">
           {renderSection()}
         </main>
       </div>

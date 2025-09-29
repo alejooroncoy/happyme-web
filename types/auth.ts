@@ -5,6 +5,7 @@ export interface AuthStep {
 export interface PhoneData {
   phoneNumber: string;
   countryCode: string;
+  userId?: number;
 }
 
 export interface SMSData {
@@ -29,6 +30,13 @@ export interface User {
   id: string;
   phoneNumber: string;
   email: string;
+  name?: string;
+  age?: number;
+  mood?: string;
+  plan?: 'Free' | 'Premium';
+  college?: string;
+  semester?: number;
+  gender?: string;
   createdAt: Date;
 }
 

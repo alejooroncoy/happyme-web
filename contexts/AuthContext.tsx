@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, ReactNode, useEffect } from 'react';
 import { AuthState, AuthStep, PhoneData, SMSData, RegisterData, LoginData, User } from '@/types/auth';
 
 type AuthAction =
@@ -15,15 +15,40 @@ type AuthAction =
   | { type: 'SET_ERROR'; payload: string | undefined }
   | { type: 'RESET' };
 
-const initialState: AuthState = {
-  currentStep: 'phone',
-  isLoading: false,
+// Función para obtener el estado inicial desde localStorage
+const getInitialState = (): AuthState => {
+  if (typeof window === 'undefined') {
+    return {
+      currentStep: 'phone',
+      isLoading: false,
+    };
+  }
+
+  try {
+    const savedUser = localStorage.getItem('happyme_user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      return {
+        currentStep: 'home',
+        isLoading: false,
+        user: user,
+      };
+    }
+  } catch (error) {
+    console.error('Error loading user from localStorage:', error);
+  }
+
+  return {
+    currentStep: 'phone',
+    isLoading: false,
+  };
 };
+
+const initialState: AuthState = getInitialState();
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case 'SET_STEP':
-      console.log('AuthReducer: Actualizando paso de', state.currentStep, 'a', action.payload);
       return { ...state, currentStep: action.payload, error: undefined };
     case 'SET_PHONE_DATA':
       return { ...state, phoneData: action.payload };
@@ -61,6 +86,7 @@ interface AuthContextType {
   setLoading: (loading: boolean) => void;
   setError: (error: string | undefined) => void;
   reset: () => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,46 +94,60 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  const goToStep = (step: AuthStep['step']) => {
-    console.log('AuthContext: Cambiando paso a:', step);
+  // Guardar usuario en localStorage cuando cambie
+  useEffect(() => {
+    if (state.user) {
+      localStorage.setItem('happyme_user', JSON.stringify(state.user));
+    } else {
+      localStorage.removeItem('happyme_user');
+    }
+  }, [state.user]);
+
+  const goToStep = useCallback((step: AuthStep['step']) => {
     dispatch({ type: 'SET_STEP', payload: step });
-  };
+  }, []);
 
-  const setPhoneData = (data: PhoneData) => {
+  const setPhoneData = useCallback((data: PhoneData) => {
     dispatch({ type: 'SET_PHONE_DATA', payload: data });
-  };
+  }, []);
 
-  const setSMSData = (data: SMSData) => {
+  const setSMSData = useCallback((data: SMSData) => {
     dispatch({ type: 'SET_SMS_DATA', payload: data });
-  };
+  }, []);
 
-  const setRegisterData = (data: RegisterData) => {
+  const setRegisterData = useCallback((data: RegisterData) => {
     dispatch({ type: 'SET_REGISTER_DATA', payload: data });
-  };
+  }, []);
 
-  const setLoginData = (data: LoginData) => {
+  const setLoginData = useCallback((data: LoginData) => {
     dispatch({ type: 'SET_LOGIN_DATA', payload: data });
-  };
+  }, []);
 
-  const setUser = (user: User) => {
+  const setUser = useCallback((user: User) => {
     dispatch({ type: 'SET_USER', payload: user });
-  };
+  }, []);
 
-  const setExistingUser = (isExisting: boolean) => {
+  const setExistingUser = useCallback((isExisting: boolean) => {
     dispatch({ type: 'SET_EXISTING_USER', payload: isExisting });
-  };
+  }, []);
 
-  const setLoading = (loading: boolean) => {
+  const setLoading = useCallback((loading: boolean) => {
     dispatch({ type: 'SET_LOADING', payload: loading });
-  };
+  }, []);
 
-  const setError = (error: string | undefined) => {
+  const setError = useCallback((error: string | undefined) => {
     dispatch({ type: 'SET_ERROR', payload: error });
-  };
+  }, []);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     dispatch({ type: 'RESET' });
-  };
+  }, []);
+
+  const logout = useCallback(() => {
+    console.log('🔐 AuthContext: Logging out user');
+    localStorage.removeItem('happyme_user');
+    dispatch({ type: 'RESET' });
+  }, []);
 
   const value: AuthContextType = {
     state,
@@ -122,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading,
     setError,
     reset,
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

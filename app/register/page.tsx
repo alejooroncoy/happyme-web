@@ -12,11 +12,13 @@ export default function RegisterPage() {
   useEffect(() => {
     if (state.user) {
       router.push('/dashboard');
-    } else {
-      // Asegurar que empezamos en el paso de teléfono
-      goToStep('phone');
     }
-  }, [state.user, router, goToStep]);
+  }, [state.user, router]);
+
+  // Solo establecer el paso inicial una vez al cargar la página
+  useEffect(() => {
+    goToStep('phone');
+  }, [goToStep]);
 
   return <AuthFlow />;
 }

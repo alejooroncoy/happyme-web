@@ -42,9 +42,33 @@ export default function RegisterStep() {
     setError(undefined);
 
     try {
-      // Simular creación de cuenta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Obtener el ID del usuario desde la verificación del teléfono
+      const userId = state.phoneData?.userId;
       
+      if (!userId) {
+        setError('Error: No se encontró el ID del usuario. Por favor, vuelve a verificar tu teléfono.');
+        return;
+      }
+
+      // Crear la cuenta en la BD
+      const response = await fetch('/api/auth/create-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          userId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear la cuenta');
+      }
+
       const registerData: RegisterData = {
         email,
         password,
@@ -54,17 +78,17 @@ export default function RegisterStep() {
       
       setRegisterData(registerData);
       
-      // Simular usuario creado
+      // Simular usuario creado (en producción vendría de la BD)
       const user = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: data.account.user_id.toString(),
         phoneNumber: state.phoneData?.phoneNumber || '',
         email,
         createdAt: new Date(),
       };
       
       setUser(user);
-    } catch (error) {
-      setError('Error al crear la cuenta. Intenta nuevamente.');
+    } catch (error: any) {
+      setError(error.message || 'Error al crear la cuenta. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }

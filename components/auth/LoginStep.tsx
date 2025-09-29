@@ -3,22 +3,22 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginData } from '@/types/auth';
-import { LogIn, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginStep() {
-  const { state, setLoginData, setUser, setLoading, setError, goToStep } = useAuth();
+  const { state, setLoginData, setUser, setLoading, setError } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(state.phoneData?.phoneNumber || '');
-  const [countryCode, setCountryCode] = useState(state.phoneData?.countryCode || '+51');
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const isFormValid = validateEmail(email) && password.length >= 6;
+  const isFormValid = validateEmail(email) && password.length >= 8;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,28 +32,50 @@ export default function LoginStep() {
     setError(undefined);
 
     try {
-      // Simular verificación de login
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Autenticar con la API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al iniciar sesión');
+      }
+
       const loginData: LoginData = {
         email,
         password,
-        phoneNumber: phoneNumber || state.phoneData?.phoneNumber || '',
+        phoneNumber: data.user.phone_number,
       };
       
       setLoginData(loginData);
       
-      // Simular usuario logueado
+      // Usuario autenticado desde la BD
       const user = {
-        id: Math.random().toString(36).substr(2, 9),
-        phoneNumber: state.phoneData?.phoneNumber || '',
-        email,
+        id: data.user.id.toString(),
+        phoneNumber: data.user.phone_number,
+        email: data.account.email,
+        name: data.user.name,
+        age: data.user.age,
+        mood: data.user.mood,
+        plan: data.user.plan,
+        college: data.user.college,
+        semester: data.user.semester,
+        gender: data.user.gender,
         createdAt: new Date(),
       };
       
       setUser(user);
-    } catch (error) {
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
+    } catch (error: any) {
+      setError(error.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
       setLoading(false);
     }
@@ -127,37 +149,6 @@ export default function LoginStep() {
                     </button>
                   </div>
                 </div>
-
-                {/* Teléfono opcional */}
-                {!state.phoneData && (
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Número de teléfono (opcional)
-                    </label>
-                    <div className="flex gap-3">
-                      <select
-                        value={countryCode}
-                        onChange={(e) => setCountryCode(e.target.value)}
-                        className="w-32 px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium"
-                      >
-                        <option value="+51">🇵🇪 +51</option>
-                        <option value="+57">🇨🇴 +57</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+52">🇲🇽 +52</option>
-                        <option value="+34">🇪🇸 +34</option>
-                      </select>
-                      
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                        placeholder="987 654 321"
-                        className="flex-1 px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 placeholder-gray-400"
-                        maxLength={9}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
 
               <button
@@ -175,7 +166,7 @@ export default function LoginStep() {
                 <p className="text-sm text-gray-600">
                   ¿No tienes cuenta?{' '}
                   <button
-                    onClick={() => goToStep('phone')}
+                    onClick={() => router.push('/register')}
                     className="font-semibold text-blue-600 hover:text-blue-700"
                   >
                     Regístrate aquí

@@ -34,30 +34,47 @@ export default function PhoneStep() {
     setError(undefined);
 
     try {
-      // Simular verificación si el usuario existe
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const phoneData: PhoneData = {
-        phoneNumber,
-        countryCode,
-      };
-      
-      setPhoneData(phoneData);
-      
-      // Simular verificación de usuario existente
-      // En producción esto sería una llamada al backend
-      const isExistingUser = phoneNumber === '987654321'; // Simular usuario existente
-      setExistingUser(isExistingUser);
-      
-      console.log('PhoneStep: Navegando al siguiente paso...', { isExistingUser, phoneNumber });
-      
-      if (isExistingUser) {
-        goToStep('login');
-      } else {
-        goToStep('sms');
+      // Llamar a la API para verificar si el teléfono existe
+      const response = await fetch('/api/auth/check-phone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber // Solo enviar el número sin el código de país
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al verificar el número');
       }
-    } catch (error) {
-      setError('Error al verificar el número. Intenta nuevamente.');
+
+      if (data.exists) {
+        // Usuario existe en la BD
+        const phoneData: PhoneData = {
+          phoneNumber,
+          countryCode,
+          userId: data.user.id,
+        };
+        
+        setPhoneData(phoneData);
+        setExistingUser(true);
+        
+        if (data.hasAccount) {
+          // Ya tiene cuenta, ir a login
+          goToStep('login');
+        } else {
+          // No tiene cuenta, ir a SMS para crear una
+          goToStep('sms');
+        }
+      } else {
+        // Usuario no existe en la BD
+        setError(data.message || 'Número de teléfono inválido');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Error al verificar el número. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -117,14 +134,14 @@ export default function PhoneStep() {
                 )}
               </div>
 
-              <button
-                type="submit"
-                disabled={!isValid || phoneNumber.length === 0}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
-              >
-                <Phone className="w-5 h-5" />
-                <span>Registrarme</span>
-              </button>
+                      <button
+                        type="submit"
+                        disabled={!isValid || phoneNumber.length === 0}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+                      >
+                        <Phone className="w-5 h-5" />
+                        <span>Registrarme</span>
+                      </button>
             </form>
             
             <div className="mt-6 space-y-4">
