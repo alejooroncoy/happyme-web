@@ -6,14 +6,14 @@ export interface UserData {
   phone_number: string;
   name: string;
   age: number;
-  mood?: string;
-  has_seen_psychologist?: boolean;
-  plan?: 'Free' | 'Premium';
-  college?: string;
-  semester?: number;
-  gender?: string;
-  created_at?: Date;
-  updated_at?: Date;
+  mood?: string | null;
+  has_seen_psychologist?: boolean | null;
+  plan?: 'Free' | 'Premium' | null;
+  college?: string | null;
+  semester?: number | null;
+  gender?: string | null;
+  created_at?: Date | null;
+  updated_at?: Date | null;
 }
 
 export interface AccountData {

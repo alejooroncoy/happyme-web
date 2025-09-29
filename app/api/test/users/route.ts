@@ -40,7 +40,7 @@ export async function GET() {
       { 
         success: false,
         error: 'Failed to fetch users from Neon DB',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error occurred' 
       },
       { status: 500 }
     );

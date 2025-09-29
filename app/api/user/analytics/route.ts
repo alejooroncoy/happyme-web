@@ -105,13 +105,13 @@ export async function GET(request: NextRequest) {
 
     // Calcular estadísticas basadas en datos reales
     const totalActivities = actions.length;
-    const completedReminders = reminders.filter(r => r.notified === true).length;
+    const completedReminders = reminders.filter((r: any) => r.notified === true).length;
     const totalReminders = reminders.length;
     const completionRate = totalReminders > 0 ? Math.round((completedReminders / totalReminders) * 100) : 0;
 
     // Calcular tipos de actividades
     const activityTypes: { [key: string]: number } = {};
-    actions.forEach(action => {
+    actions.forEach((action: any) => {
       const type = action.action_type || 'otro';
       activityTypes[type] = (activityTypes[type] || 0) + 1;
     });
@@ -123,20 +123,20 @@ export async function GET(request: NextRequest) {
     };
     
     const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    actions.forEach(action => {
+    actions.forEach((action: any) => {
       const dayName = dayNames[action.created_at.getDay()];
       activitiesByDay[dayName] = (activitiesByDay[dayName] || 0) + 1;
     });
 
     // Calcular distribución de estados de ánimo reales
     const moodDistribution: { [key: string]: number } = {};
-    actions.forEach(action => {
+    actions.forEach((action: any) => {
       const mood = action.mood_at_action || 'neutral';
       moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
     });
 
     // Calcular tendencia de mood (basada en datos reales)
-    const moodTrend = actions.map((action, index) => ({
+    const moodTrend = actions.map((action: any, index: number) => ({
       date: action.created_at.toISOString().split('T')[0],
       mood: action.mood_at_action || 'neutral',
       value: Math.floor(Math.random() * 5) + 5
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       
       while (checkDate >= new Date('2020-01-01')) { // Límite razonable hacia atrás
         const dayString = checkDate.toDateString();
-        const hasActivity = actions.some(action => 
+        const hasActivity = actions.some((action: any) => 
           new Date(action.created_at).toDateString() === dayString
         );
         
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
           )[0],
           mostActiveHour: '14:00',
           weeklyPattern: periodData.activitiesByDay,
-          dailyActivity: periodData.moodTrend.map(day => ({
+          dailyActivity: periodData.moodTrend.map((day: any) => ({
             date: day.date,
             count: Math.round(periodData.totalActivities / Math.max(periodData.moodTrend.length, 1))
           }))
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
           hasSeenPsychologist: user.has_seen_psychologist || false,
           registrationDate: user.created_at?.toISOString() || new Date().toISOString()
         },
-        remindersList: remindersForList.map(reminder => ({
+        remindersList: remindersForList.map((reminder: any) => ({
           id: reminder.id,
           title: reminder.title,
           description: reminder.description,
