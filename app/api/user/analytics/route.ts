@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../node_modules/.prisma/client';
+import { PrismaClient } from "../../../../app/generated/prisma-bots";
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_BOTS_URL
-    }
-  }
-});
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
