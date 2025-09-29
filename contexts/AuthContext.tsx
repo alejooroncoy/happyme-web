@@ -17,6 +17,7 @@ type AuthAction =
 
 // Función para obtener el estado inicial desde localStorage
 const getInitialState = (): AuthState => {
+  // En el servidor, siempre retornar el estado inicial sin usuario
   if (typeof window === 'undefined') {
     return {
       currentStep: 'phone',
@@ -24,6 +25,7 @@ const getInitialState = (): AuthState => {
     };
   }
 
+  // En el cliente, intentar cargar desde localStorage
   try {
     const savedUser = localStorage.getItem('happyme_user');
     if (savedUser) {

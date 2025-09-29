@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "../../../../app/generated/prisma-bots";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_BOTS_URL
+    }
+  }
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,48 +59,75 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener acciones del usuario en el período especificado
-    const actions = await prisma.actions_logs.findMany({
-      where: period === 'total'
-        ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
-        : {
-            user_id: parseInt(userId),
-            created_at: {
-              gte: startDate,
-              lte: now
-            }
-          },
-      orderBy: { created_at: 'asc' }
-    });
+    let actions: any[] = [];
+    try {
+      console.log('🔍 Querying actions_logs for user:', userId);
+      actions = await prisma.actions_logs.findMany({
+        where: period === 'total'
+          ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
+          : {
+              user_id: parseInt(userId),
+              created_at: {
+                gte: startDate,
+                lte: now
+              }
+            },
+        orderBy: { created_at: 'asc' }
+      });
+      console.log('✅ Actions query successful, found:', actions.length);
+    } catch (actionsError) {
+      console.error('❌ Error querying actions_logs:', actionsError);
+      // Continuar con array vacío en caso de error
+      actions = [];
+    }
 
     // Obtener recordatorios del usuario en el período especificado
-    const reminders = await prisma.reminders.findMany({
-      where: period === 'total' 
-        ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
-        : {
-            user_id: parseInt(userId),
-            created_at: {
-              gte: startDate,
-              lte: now
-            }
-          },
-      orderBy: { created_at: 'asc' }
-    });
+    let reminders: any[] = [];
+    try {
+      console.log('🔍 Querying reminders for user:', userId);
+      reminders = await prisma.reminders.findMany({
+        where: period === 'total' 
+          ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
+          : {
+              user_id: parseInt(userId),
+              created_at: {
+                gte: startDate,
+                lte: now
+              }
+            },
+        orderBy: { created_at: 'asc' }
+      });
+      console.log('✅ Reminders query successful, found:', reminders.length);
+    } catch (remindersError) {
+      console.error('❌ Error querying reminders:', remindersError);
+      // Continuar con array vacío en caso de error
+      reminders = [];
+    }
 
     // Obtener recordatorios para la lista detallada según el período seleccionado
-    const remindersForList = await prisma.reminders.findMany({
-      where: period === 'total' 
-        ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
-        : {
-            user_id: parseInt(userId),
-            created_at: {
-              gte: startDate,
-              lte: now
-            }
-          },
-      orderBy: {
-        created_at: 'desc'
-      }
-    });
+    let remindersForList: any[] = [];
+    try {
+      console.log('🔍 Querying remindersForList for user:', userId);
+      remindersForList = await prisma.reminders.findMany({
+        where: period === 'total' 
+          ? { user_id: parseInt(userId) }  // Sin filtro de fecha para "total"
+          : {
+              user_id: parseInt(userId),
+              created_at: {
+                gte: startDate,
+                lte: now
+              }
+            },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+      console.log('✅ RemindersForList query successful, found:', remindersForList.length);
+    } catch (remindersListError) {
+      console.error('❌ Error querying remindersForList:', remindersListError);
+      // Continuar con array vacío en caso de error
+      remindersForList = [];
+    }
 
     console.log('📊 Found actions:', actions.length, 'reminders:', reminders.length);
 
@@ -249,8 +283,13 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    // Desconectar Prisma después de completar la respuesta
+    await prisma.$disconnect();
+
   } catch (error) {
     console.error('❌ Error in analytics API:', error);
+    // Desconectar Prisma en caso de error
+    await prisma.$disconnect();
     return NextResponse.json(
       { 
         success: false,
@@ -260,6 +299,6 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
+    // No desconectar aquí para evitar problemas de concurrencia
   }
 }
